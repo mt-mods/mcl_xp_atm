@@ -26,26 +26,25 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 	
 	local balance = clicker:get_meta():get_int("mcl_xp_atm_account")
 	
-	minetest.show_formspec(playername,
-		"mcl_xp_atm:xp_atm",
-		table.concat({
-			"size[5.6,6.5]",
-			"label[0,0;"..F(C("#313131", name)).."]",
-			"label[0,0.5;"..F(C("#313131",S("XP Balance")..": "..balance)).."]",
-			"label[0,1;"..F(C("#313131",S("Deposit"))).."]",
-			"button[0,1.5;1,1;deposit_1;1]",
-			"button[0,2.5;1,1;deposit_5;5]",
-			"button[0,3.5;1,1;deposit_10;10]",
-			"button[0,4.5;1,1;deposit_100;100]",
-			"button[0,5.5;1,1;deposit_1000;1000]",
-			"label[1.5,1;"..F(C("#313131",S("Withdraw"))).."]",
-			"button[1.5,1.5;1,1;withdraw_1;1]",
-			"button[1.5,2.5;1,1;withdraw_5;5]",
-			"button[1.5,3.5;1,1;withdraw_10;10]",
-			"button[1.5,4.5;1,1;withdraw_100;100]",
-			"button[1.5,5.5;1,1;withdraw_1000;1000]",
-		})
-	)
+	formspec = table.concat({
+		"size[5.6,6.5]",
+		"label[0,0;"..F(C("#313131", name)).."]",
+		"label[0,0.5;"..F(C("#313131",S("XP Balance")..": "..balance)).."]",
+		"label[0,1;"..F(C("#313131",S("Deposit"))).."]",
+		"button[0,1.5;1,1;deposit_1;1]",
+		"button[0,2.5;1,1;deposit_5;5]",
+		"button[0,3.5;1,1;deposit_10;10]",
+		"button[0,4.5;1,1;deposit_100;100]",
+		"button[0,5.5;1,1;deposit_1000;1000]",
+		"label[1.5,1;"..F(C("#313131",S("Withdraw"))).."]",
+		"button[1.5,1.5;1,1;withdraw_1;1]",
+		"button[1.5,2.5;1,1;withdraw_5;5]",
+		"button[1.5,3.5;1,1;withdraw_10;10]",
+		"button[1.5,4.5;1,1;withdraw_100;100]",
+		"button[1.5,5.5;1,1;withdraw_1000;1000]",
+	})
+	minetest.show_formspec(playername, "mcl_xp_atm:xp_atm", formspec)
+	
 	minetest.register_on_player_receive_fields(function(player, form, pressed)
 		local xp_amount = {1, 5, 10, 100, 1000}
 		playername = player:get_player_name()
@@ -56,9 +55,10 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 				if pressed["withdraw_" .. i] then
 					if balance >= i then
 						mcl_experience.add_xp(player, i)
-						--minetest.chat_send_player(playername, "[Experience ATM] Successfully Withdrew " .. i .. " XP.")
-						balance = balance - i
-						player:get_meta():set_int("mcl_xp_atm_account", balance)
+						minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Withdrew") .. " " .. i .. " " .. S("XP."))
+						minetest.log("action", "[Experience ATM] " .. playername .. " withdrew " .. i .. " XP from their account.")
+						local balance_new = balance - i
+						player:get_meta():set_int("mcl_xp_atm_account", balance_new)
 					elseif balance < i then
 						minetest.chat_send_all("[Experience ATM] " ..  S("Not Enough XP in your account."))
 						return
@@ -66,9 +66,10 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 				elseif pressed["deposit_"..i] then
 					if experience >= i then
 						mcl_experience.add_xp(player, -i)
-						--minetest.chat_send_player(playername, "[Experience ATM] Successfully Deposited " .. i .. " XP.")
-						balance = balance + i
-						player:get_meta():set_int("mcl_xp_atm_account", balance)
+						minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Deposited") .. " " .. i .. " " .. S("XP."))
+						minetest.log("action", "[Experience ATM] " .. playername .. " deposited " .. i .. " XP to their account.")
+						local balance_new = balance + i
+						player:get_meta():set_int("mcl_xp_atm_account", balance_new)
 					elseif experience < i then
 						minetest.chat_send_all("[Experience ATM] " .. S("Not Enough XP in your inventory."))
 						return
