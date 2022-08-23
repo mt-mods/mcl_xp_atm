@@ -60,7 +60,7 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 						balance = balance - i
 						player:get_meta():set_int("mcl_xp_atm_account", balance)
 					elseif balance < i then
-						minetest.chat_send_all("[Experience ATM] Not Enough XP in your account.")
+						minetest.chat_send_all("[Experience ATM] " ..  S("Not Enough XP in your account."))
 						return
 					end
 				elseif pressed["deposit_"..i] then
@@ -70,7 +70,7 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 						balance = balance + i
 						player:get_meta():set_int("mcl_xp_atm_account", balance)
 					elseif experience < i then
-						minetest.chat_send_all("[Experience ATM] Not Enough XP in your inventory.")
+						minetest.chat_send_all("[Experience ATM] " .. S("Not Enough XP in your inventory."))
 						return
 					end
 				end

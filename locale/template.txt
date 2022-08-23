@@ -1,0 +1,8 @@
+Experience ATM=
+XP Balance=
+Deposit=
+Withdraw=
+Not Enough XP in your account.=
+Not Enough XP in your inventory.=
+Adds an ATM to store your XP.=
+Used to store your experience points in a "bank account".=
