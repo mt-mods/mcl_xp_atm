@@ -47,7 +47,7 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 		})
 	)
 	minetest.register_on_player_receive_fields(function(player, form, pressed)
-		xp_amount = {1, 5, 10, 100, 1000}
+		local xp_amount = {1, 5, 10, 100, 1000}
 		playername = player:get_player_name()
 		if form == "mcl_xp_atm:xp_atm" then
 			local balance = player:get_meta():get_int("mcl_xp_atm_account")
@@ -95,4 +95,14 @@ minetest.register_node("mcl_xp_atm:xp_atm",{
 	_mcl_blast_resistance = 3,
 	_mcl_hardness = 3,
 	on_rightclick = gui,
+})
+
+-- Define Craft Recipe
+minetest.register_craft({
+	output = "mcl_xp_atm:xp_atm",
+	recipe = {
+		{"mcl_core:iron_ingot", "mesecons:redstone", "mcl_core:iron_ingot"},
+		{"mcl_core:glass", "mcl_potions:glass_bottle", "mcl_core:glass"},
+		{"mcl_core:iron_ingot", "mesecons:redstone", "mcl_core:iron_ingot"}
+	}
 })
