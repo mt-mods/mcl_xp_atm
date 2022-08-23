@@ -8,7 +8,8 @@ local F = minetest.formspec_escape
 
 -- Create XP ATM Account
 minetest.register_on_joinplayer(function(player)
-	if not player:get_meta():get_int("mcl_xp_atm_account") or player:get_meta():get_int("mcl_xp_atm_account") == "" or nil then
+	local xp_account = player:get_meta():get_int("mcl_xp_atm_account")
+	if not xp_account or xp_account == nil then
 		player:get_meta():set_int("mcl_xp_atm_account", 0)
 	else
 		return false
@@ -17,18 +18,11 @@ end)
 
 -- ATM GUI
 local gui = function(pos, node, clicker, itemstack, pointed_thing)
-	local name = minetest.get_meta(pos):get_string("name")
 	local playername = clicker:get_player_name()
-	
-	if name == "" then
-		name = S("Experience ATM") .. ": " .. playername
-	end
-	
 	local balance = clicker:get_meta():get_int("mcl_xp_atm_account")
-	
-	formspec = table.concat({
+	local formspec = table.concat({
 		"size[5.6,6.5]",
-		"label[0,0;"..F(C("#313131", name)).."]",
+		"label[0,0;"..F(C("#313131", S("Experience ATM"))).."]",
 		"label[0,0.5;"..F(C("#313131",S("XP Balance")..": "..balance)).."]",
 		"label[0,1;"..F(C("#313131",S("Deposit"))).."]",
 		"button[0,1.5;1,1;deposit_1;1]",
@@ -44,41 +38,44 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 		"button[1.5,5.5;1,1;withdraw_1000;1000]",
 	})
 	minetest.show_formspec(playername, "mcl_xp_atm:xp_atm", formspec)
-	
-	minetest.register_on_player_receive_fields(function(player, form, pressed)
-		local xp_amount = {1, 5, 10, 100, 1000}
-		playername = player:get_player_name()
-		if form == "mcl_xp_atm:xp_atm" then
-			local balance = player:get_meta():get_int("mcl_xp_atm_account")
-			local experience = mcl_experience.get_xp(player)
-			for _, i in ipairs(xp_amount) do
-				if pressed["withdraw_" .. i] then
-					if balance >= i then
-						mcl_experience.add_xp(player, i)
-						minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Withdrew") .. " " .. i .. " " .. S("XP."))
-						minetest.log("action", "[Experience ATM] " .. playername .. " withdrew " .. i .. " XP from their account.")
-						local balance_new = balance - i
-						player:get_meta():set_int("mcl_xp_atm_account", balance_new)
-					elseif balance < i then
-						minetest.chat_send_all("[Experience ATM] " ..  S("Not Enough XP in your account."))
-						return
-					end
-				elseif pressed["deposit_"..i] then
-					if experience >= i then
-						mcl_experience.add_xp(player, -i)
-						minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Deposited") .. " " .. i .. " " .. S("XP."))
-						minetest.log("action", "[Experience ATM] " .. playername .. " deposited " .. i .. " XP to their account.")
-						local balance_new = balance + i
-						player:get_meta():set_int("mcl_xp_atm_account", balance_new)
-					elseif experience < i then
-						minetest.chat_send_all("[Experience ATM] " .. S("Not Enough XP in your inventory."))
-						return
-					end
+end
+
+minetest.register_on_player_receive_fields(function(player, form, pressed)
+	local balance = player:get_meta():get_int("mcl_xp_atm_account")
+	local xp_amount = {1, 5, 10, 100, 1000}
+	local playername = player:get_player_name()
+	if form == "mcl_xp_atm:xp_atm" then
+		local balance = player:get_meta():get_int("mcl_xp_atm_account")
+		local experience = mcl_experience.get_xp(player)
+		for _, i in ipairs(xp_amount) do
+			if pressed["withdraw_" .. i] then
+				if balance >= i then
+					mcl_experience.add_xp(player, i)
+					minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Withdrew") .. " " .. i .. " " .. S("XP."))
+					minetest.log("action", "[Experience ATM] " .. playername .. " withdrew " .. i .. " XP from their account.")
+					local balance_new = balance - i
+					player:get_meta():set_int("mcl_xp_atm_account", balance_new)
+					gui(nil, nil, player)
+				elseif balance < i then
+					minetest.chat_send_all("[Experience ATM] " ..  S("Not Enough XP in your account."))
+					return
+				end
+			elseif pressed["deposit_"..i] then
+				if experience >= i then
+					mcl_experience.add_xp(player, -i)
+					minetest.chat_send_player(playername, "[Experience ATM] " .. S("Successfully Deposited") .. " " .. i .. " " .. S("XP."))
+					minetest.log("action", "[Experience ATM] " .. playername .. " deposited " .. i .. " XP to their account.")
+					local balance_new = balance + i
+					player:get_meta():set_int("mcl_xp_atm_account", balance_new)
+					gui(nil, nil, player)
+				elseif experience < i then
+					minetest.chat_send_all("[Experience ATM] " .. S("Not Enough XP in your inventory."))
+					return
 				end
 			end
 		end
-	end)
-end
+	end
+end)
 
 -- Define XP ATM Node
 minetest.register_node("mcl_xp_atm:xp_atm",{
