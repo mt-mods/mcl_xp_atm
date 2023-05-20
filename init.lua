@@ -57,7 +57,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					player:get_meta():set_int("mcl_xp_atm_account", balance_new)
 					gui(nil, nil, player)
 				elseif balance < i then
-					minetest.chat_send_all("[Experience ATM] " ..  S("Not Enough XP in your account."))
+					minetest.chat_send_player(playername, "[Experience ATM] " ..  S("Not Enough XP in your account."))
 					return
 				end
 			elseif pressed["deposit_"..i] then
@@ -69,7 +69,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					player:get_meta():set_int("mcl_xp_atm_account", balance_new)
 					gui(nil, nil, player)
 				elseif experience < i then
-					minetest.chat_send_all("[Experience ATM] " .. S("Not Enough XP in your inventory."))
+					minetest.chat_send_player(playername, "[Experience ATM] " .. S("Not Enough XP in your inventory."))
 					return
 				end
 			end
