@@ -90,6 +90,7 @@ minetest.register_node("mcl_xp_atm:xp_atm",{
 		"mcl_xp_atm_top.png", "mcl_xp_atm_front.png",
 	},
 	groups = { pickaxey = 1, punchy = 2 },
+	is_ground_content = false,
 	_mcl_blast_resistance = 3,
 	_mcl_hardness = 3,
 	on_rightclick = gui,
